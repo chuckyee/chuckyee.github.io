@@ -1,16 +1,32 @@
 ---
-published: false
+layout: post
+published: true
 mathjax: true
 ---
-# Cardiac MRI Segmentation
 
-The [Insight](insightdata.ai) Artificial Intelligence Fellows Program is an intense, 7-week experience where fellows already possessing deep technical expertise bridge the small skills gap needed to enter the AI field. A major component of bridging that gap involves completing a project in deep learning in order to gain hands-on experience in AI.
+The [Insight](insightdata.ai) Artificial Intelligence Fellows Program is an
+intense, 7-week experience where fellows already possessing deep technical
+expertise bridge the small skills gap needed to enter the AI field. A major
+component of bridging that gap involves completing a project in deep learning
+in order to gain hands-on experience in AI.
 
-I was fortunate to be selected as a fellow for the 2017 program in NYC. In that first week, each in our class of 17 was tasked with making a hard transition away from our prior work and selecting a project that would come to consume our every waking moment for the next month. I knew that project selection, maybe even more than my own technical ability, would determine my level of success.
+I was fortunate to be selected as a fellow for the 2017 program in NYC. In that
+first week, each in our class of 17 was tasked with making a hard transition
+away from our prior work and selecting a project that would come to consume our
+every waking moment for the next month. I knew that project selection, maybe
+even more than my own technical ability, would determine my level of success.
 
-Deep learning was a new field in which I had little real experience. I thought that approaching this like a new graduate student would be a fruitful model: what do we always tell new students picking advisers? Find a professor who has (a) an awareness of the human side of doing research combined with (b) a track record of giving new students clearly-scoped and well-motivated first projects. For (a), we had a great group of program managers and each other to seek guidance and share expertise. For (b), I chose to tackle an open call for research from Francois Chollet's [AI Open
-Network](http://ai-on.org/): build a deep learning model to identify the right
-ventricle in cardiac MRIs. Not the sexiest nor most novel project, but it was scoped and had an utterly practical use, so I thought it was the perfect first project in AI.
+Deep learning was a new field in which I had little real experience. I thought
+that approaching this like a new graduate student would be a fruitful model:
+what do we always tell new students picking advisers? Find a professor who has
+(a) an awareness of the human side of doing research combined with (b) a track
+record of giving new students clearly-scoped and well-motivated first projects.
+For (a), we had a great group of program managers and each other to seek
+guidance and share expertise. For (b), I chose to tackle an open call for
+research from Francois Chollet's [AI Open Network](http://ai-on.org/): build a
+deep learning model to identify the right ventricle in cardiac MRIs. Not the
+sexiest nor most novel project, but it was scoped and had an utterly practical
+use, so I thought it was the perfect first project in AI.
 
 ## Problem description
 
@@ -63,7 +79,7 @@ research:
 We use the Dice coefficient to compare the pixel-wise agreement between the
 predicted segmentation and the corresponding ground truth.
 
-$$ \mathrm{dice}(X, Y) = \frac{X \cap Y}{X + Y} $$
+$$ \mathrm{dice}(X, Y) = \frac{2 X \cap Y}{X + Y} $$
 
 ![dice-jaccard](/images/dice-coef.png)
 
