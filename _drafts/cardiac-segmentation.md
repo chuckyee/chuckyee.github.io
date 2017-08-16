@@ -1,5 +1,6 @@
 ---
 published: false
+mathjax: true
 ---
 # Cardiac MRI Segmentation
 
@@ -62,7 +63,9 @@ research:
 We use the Dice coefficient to compare the pixel-wise agreement between the
 predicted segmentation and the corresponding ground truth.
 
-![dice-jaccard](/images/dice-jaccard.png)
+$$ \mathrm{dice}(X, Y) = \frac{X \cap Y}{X + Y} $$
+
+![dice-jaccard](/images/dice-coef.png)
 
 ## Dataset
 
