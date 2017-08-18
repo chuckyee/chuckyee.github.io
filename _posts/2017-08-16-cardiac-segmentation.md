@@ -1,32 +1,22 @@
 ---
 layout: post
+title: "Cardiac MRI Segmentation"
 published: true
 mathjax: true
 ---
 
-The [Insight](insightdata.ai) Artificial Intelligence Fellows Program is an
-intense, 7-week experience where fellows already possessing deep technical
-expertise bridge the small skills gap needed to enter the AI field. A major
-component of bridging that gap involves completing a project in deep learning
-in order to gain hands-on experience in AI.
+A human heart is an astounding machine that is designed to continually function
+for up to a century without failure. One of the key ways to measure how well
+your heart is functioning is to compute its [ejection
+fraction](https://en.wikipedia.org/wiki/Ejection_fraction): after your heart
+relaxes at its diastole to fully fill with blood, what percentage does it pump
+out upon contracting to its systole? Getting at this metric relies on tracing
+the outlines of the ventricles from cardiac images.
 
-I was fortunate to be selected as a fellow for the 2017 program in NYC. In that
-first week, each in our class of 17 was tasked with making a hard transition
-away from our prior work and selecting a project that would come to consume our
-every waking moment for the next month. I knew that project selection, maybe
-even more than my own technical ability, would determine my level of success.
-
-Deep learning was a new field in which I had little real experience. I thought
-that approaching this like a new graduate student would be a fruitful model:
-what do we always tell new students picking advisers? Find a professor who has
-(a) an awareness of the human side of doing research combined with (b) a track
-record of giving new students clearly-scoped and well-motivated first projects.
-For (a), we had a great group of program managers and each other to seek
-guidance and share expertise. For (b), I chose to tackle an open call for
-research from Francois Chollet's [AI Open Network](http://ai-on.org/): build a
-deep learning model to identify the right ventricle in cardiac MRIs. Not the
-sexiest nor most novel project, but it was scoped and had an utterly practical
-use, so I thought it was the perfect first project in AI.
+During my time at the [Insight AI Program](http://insightdata.ai) in NYC, I
+decided to tackle the [right ventricle segmentation
+challenge](http://ai-on.org/projects/cardiac-mri-segmentation.html) from the
+calls for research hosted by the [AI Open Network](http://ai-on.org/).
 
 ## Problem description
 
@@ -37,63 +27,159 @@ From the call for research:
 > this has been mostly handled by classical image processing methods. Modern
 > deep learning techniques have the potential to provide a more reliable,
 > fully-automated solution.
->
-> A recent [Kaggle
-> challenge](https://www.kaggle.com/c/second-annual-data-science-bowl) focused
-> on measuring the volume of the left ventricle from MRI images. Deep learning
-> techniques proved very effective, and some of the top entries from this
-> challenge can provide inspiration for right-ventricle segmentation. Note that
-> right-ventricle segmentation is likely to be a harder problem due to the more
-> complex geometry of the right ventricle. Several challenges exist in the
-> automatic segmentation of the right ventricle: presence of trabeculations in
-> the cavity with signal intensities similar to that of the myocardium; the
-> complex crescent shape of the RV, which varies from the base to the apex;
-> difficulty in segmenting the apical image slices; considerable variability in
-> shape and intensity of the chamber among subjects, notably in pathological
-> cases, etc.
 
-## Why this problem matters
+All three winners of the [left ventricle segmentation
+challenge](https://www.kaggle.com/c/second-annual-data-science-bowl) sponsored
+by Kaggle in 2016 were deep learning solutions. However, segmenting the right
+ventricle (RV) is more challenging, because of:
 
-Segmentation of the right ventricle is the first step in estimating the
-ventricular volume, a key diagnostic for heart disease. Again from the call for
-research:
+> [the] presence of trabeculations in the cavity with signal intensities similar to
+> that of the myocardium; the complex crescent shape of the RV, which varies
+> from the base to the apex; difficulty in segmenting the apical image slices;
+> considerable variability in shape and intensity of the chamber among
+> subjects, notably in pathological cases, etc.
 
-> Cardiac MRI is routinely being used for the evaluation of the function and
-> structure of the cardiovascular system. The obtained magnetic resonance
-> images of patients are inspected both visually and quantitatively by
-> clinicians to extract important information about heart function.
-> Segmentation of the heart chambers, such as the right ventricle, in cardiac
-> magnetic resonance images is an essential step for the computation of
-> clinical indices such as ventricular volume and ejection fraction (note: you
-> could also try to directly predict ventricular volume, although it would be
-> more difficult).
->
-> Manual delineation by experts is currently the standard clinical practice for
-> right ventricle segmentation. However, manual segmentation is tedious, time
-> consuming and prone to intra and inter-observer variability. Therefore, it is
-> necessary to reproducibly automate this task to accelerate and facilitate the
-> process of diagnosis and follow-up.
+Medical jargon aside, it's just more difficult to identify the RV. The left
+ventricle is a thick-walled circle while the right ventricle is an irregularly
+shaped object:
 
-## How to measure success
+![data-easy](/images/data-easy.png)
 
-We use the Dice coefficient to compare the pixel-wise agreement between the
-predicted segmentation and the corresponding ground truth.
+That was an easy example. This one is more difficult:
 
-$$ \mathrm{dice}(X, Y) = \frac{2 X \cap Y}{X + Y} $$
+![data-medium](/images/data-medium.png)
 
-![dice-jaccard](/images/dice-coef.png)
+And this one is downright challenging to the untrained eye:
 
-## Dataset
+![data-hard](/images/data-hard.png)
+
+Human physicians in fact take twice as long to determine the RV volume and
+produce results that have 2-3 times the variability as compared to the left
+ventricle [[1](https://dx.doi.org/10.1007/s00330-011-2152-0)]. The goal of this
+work is to build a deep learning model that automates right ventricle
+segmentation with high accuracy.
+
+## The dataset
 
 The dataset (accessible
 [here](http://www.litislab.fr/?sub_project=how-to-download-the-data)) contains
-3940 MRI images, with 243 of them labeled from which the training and
-validation set is drawn. The small size of labeled data is common in medical
-contexts and will require the extensive use of data augmentation. Additionally,
-the accuracy of the ground truths are dependent on the skill of the labeling
-physician.
+243 images like those shown above along with an RV segmentation mask produced
+by a physician. There are 3697 additional unlabeled images, which may be useful
+for unsupervised or semi-supervised techniques, but are set aside in this work.
+The images have dimensions 216 x 256 pixels, and we rotate them all into
+landscape format.
+
+Given the small dataset size, one would suspect generalization to unseen images
+would be hopeless! This unfortunately is the typical situation in medical
+settings where labeled data is expensive to come by. The standard procedure is
+to apply affine transformations to the data: random rotations, translations,
+zooms and shears. We also implemented elastic deformations, which locally
+stretch and compress the image
+[[2](https://www.microsoft.com/en-us/research/publication/best-practices-for-convolutional-neural-networks-applied-to-visual-document-analysis/)].
+
+![data-augmentation](/images/data-augmentation.png)
+
+In our training framework, we apply these transformations on the fly so the
+network sees new random transformations during each epoch.
+
+As is also common, there is a large class imbalance since most of the pixels
+are background. Normalizing the pixel intensities to lie between 0 and 1, we
+see that across the entire dataset, only 5.1% of the pixels are part of the RV
+cavity.
 
 ![pixel-stats](/images/pixel-statistics.png)
+
+In constructing our loss functions, we experimented with reweighting schemes to
+balance the class distributions, but ultimately found that a simple average
+performed best.
+
+## U-net: the baseline model
+
+In the medical segmentation domain, most architectures have been based on
+convolutional networks which construct feature maps at varying scales and then
+combine them to form the pixel-wise segmentation mask (see
+[[3](https://arxiv.org/abs/1701.03056)] for a recent review). We selected as
+our baseline model the u-net, proposed by Ronneberger, Fischer and Brox
+[[4](https://link.springer.com/chapter/10.1007/978-3-319-24574-4_28)], since it
+has been quite successful in biomedical segmentation tasks. The authors were
+able to successful train their network with only 30 images combined with
+aggressive image augmentation. (I suspect their task was less complex, as it
+consisted of delineating cells in microscopy images.)
+
+The u-net architecture consists of a contracting path, which collapses an image
+down into a set of high level features, followed by an expanding path which
+applies the feature information to construct a pixel-wise segmentation mask.
+The unique aspect of the u-net are its "copy and concatenate" connections which
+pass information from early feature maps to the later portions of the network
+tasked with constructing the segmentation mask. The authors propose that these
+connections allow the network to incorporate high level features and pixel-wise
+detail simultaneously.
+
+The architecture we used is shown here:
+
+![unet-architecture](/images/unet-architecture.png)
+
+We adapted the u-net to our purposes by reducing the number of downsampling
+layers from four to three, since our images were roughly half the size as those
+considered by the original authors. We also zero pad our convolutions (as
+opposed to unpadded) to keep the images the same size. The model was
+implemented in Keras.
+
+To talk about loss functions, we need to introduce some notation. The output of
+the model is a (width $\times$ height $\times$ nclasses) mask which we denote
+by $\hat{y}_{nk}$, where $n$ runs over all pixels and $k$ runs over the classes
+(in our case, background and right ventricle). The ground truth is $y_{nk}$,
+which is one-hot encoded across the classes. We considered the pixel-wise cross
+entropy
+
+$$ L(y, \hat{y}) = -\sum_{nk} w_k y_{nk} \log \hat{y}_{nk} $$
+
+and the soft dice loss
+
+$$ L(y, \hat{y}) = 1 - \sum_k w_k \frac{\sum_n y_{nk} \hat{y}_{nk}}{\sum_n
+y_{nk} + \sum_n \hat{y}_{nk}} $$
+
+They have been modified from 
+
+What about different numbers of feature maps?
+
+## Results
+
+We use the Dice coefficient to compare the pixel-wise agreement between the
+predicted segmentation and the corresponding ground truth. If $X$ and $Y$ are
+the predicted and ground truth areas,
+
+![dice-venn](/images/dice-venn.png)
+
+the [Dice
+coefficient](https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient)
+is given by twice the intersection over the sum of areas,
+
+$$ \mathrm{dice}(X, Y) = \frac{2 X \cap Y}{X + Y} $$
+
+It is 0 for disjoint areas, and 1 for perfect agreement.
+
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+
+## Dilated u-nets: global receptive fields
+
+![receptive-field-unet](/images/receptive-field-unet.png)
+![receptive-field-dilated-unet](/images/receptive-field-dilated-unet.png)
+
+![dilated-convs](/images/dilated-convs.png)
+
+## Dilated DenseNets
+
+![dilated-densenet](/images/dilated-densenet.png)
+
+## Other stuff
+
+![predicted-masks](/images/predicted-masks.png)
 
 ## References
 
@@ -106,3 +192,17 @@ physician.
 Note: this entire library is written with the Tensorflow backend in mind --
 (batch, height, width, channels) ordered is assumed and is not portable to
 Theano.
+
+## About this project
+
+The [Insight Artificial Intelligence Fellows Program](http://insightdata.ai) is
+an intense, 7-week experience where fellows already possessing deep technical
+expertise are provided an environment to bridge the small skills gap needed to
+enter the AI field. A major component of bridging that gap involves completing
+a project in deep learning in order to gain hands-on experience in AI.
+
+As a fellow in the 2017 NYC program with little prior experience in deep
+learning, I approached project selection like a new graduate student: choose a
+clearly motivated and well scoped problem that could be tackled in 4 weeks. I
+deliberately selected a project with small a dataset to allow me to quickly
+iterate and gain experience in deep learning.
