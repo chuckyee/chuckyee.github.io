@@ -42,7 +42,8 @@ ventricle (RV) is more challenging, because of:
 Medical jargon aside, it's just more difficult to identify the RV. The left
 ventricle is a thick-walled circle while the right ventricle is an irregularly
 shaped object with thin walls that sometimes blends in with the surrounding
-tissue:
+tissue. Here are the manually drawn contours for the inner and outer walls
+(endocardium and epicardium) of the right ventricle:
 
 ![data-easy](/images/data-easy.png)
 
@@ -183,7 +184,7 @@ Schematically, we replace the convolutional layers producing the feature maps
 marked in yellow with dilated convolutions in our u-net. The innermost neurons
 now have receptive fields spanning the entire input image.
 
-## Dilated densenets: looking at multiple scales at once
+## Dilated densenets: multiple scales at once
 
 The final architecture we considered is a "dilated densenet". The idea is
 simple: combine dilated convolutions with a dense convolutional network
@@ -215,7 +216,8 @@ image down into small feature maps to generate high-level representations.
 Rather, it retains the same feature map size throughout (we use zero padding),
 and relies on dilated convolutions. In the final convolutional layer, the
 neurons have access to global context as well as features produced at every
-prior scale in the network. In our work, we use an 8-layer dilated densenet.
+prior scale in the network. In our work, we use an 8-layer dilated densenet and
+vary the growth rate from 12 to 32.
 
 Let's see how these architectures perform when segmenting right ventricles.
 
@@ -250,7 +252,7 @@ Rounding isn't a differentiable operation and cannot be used as a loss
 function. We use the usual "hard" dice coefficient to report the classification
 performance.
 
-In our training experiments, we varied the following hyperparameters:
+In our training runs, we varied the following hyperparameters:
 * Batch normalization
 * Dropout
 * Learning rate
@@ -258,39 +260,111 @@ In our training experiments, we varied the following hyperparameters:
 
 ## Results
 
-The dilated densenet performed the best, reaching a dice coefficient of 0.87 on
-the validation dataset with only 190K parameters. The results are summarized
-below:
+We estimated human-level performance to be about 0.95 by looking at the quality
+of the provided manual segmentation contours. The leading published model is a
+fully convolutional network (FCN) by Tran
+[[7](https://arxiv.org/abs/1604.00494)] with 0.84 accuracy on the test set. The
+u-net base model performs well, the dilated u-net does better, and the dilated
+densenet performs the best, reaching a dice coefficient of 0.87 on the
+validation dataset with only 190K parameters.
+
+The dice coefficients, along with their uncertainties in parentheses, are
+summarized in the following table. For the endocardium:
 
 | **Method**       | **Train**   | **Val**     | **Test**    | **Params** |
 | :--------------- | :---------- | :---------- | :-------    | :--------- |
 | Human            | 0.95 (0.05) | --          | --          | --         |
-| FCN (published)  | --          | --          | 0.84 (0.21) | ~11M       |
-| U-net            | 0.91 (0.06) | 0.82 (0.23) |             | 1.9M       |
-| Dilated u-net    | 0.92 (0.08) | 0.85 (0.19) |             | 3.7M       |
-| Dilated densenet | 0.91 (0.10) | 0.87 (0.15) |             | 0.19M      |
+| FCN (Tran 2017)  | --          | --          | 0.84 (0.21) | ~11M       |
+| U-net            | 0.91 (0.06) | 0.82 (0.23) | TBD         | 1.9M       |
+| Dilated u-net    | 0.92 (0.08) | 0.85 (0.19) | TBD         | 3.7M       |
+| Dilated densenet | 0.91 (0.10) | 0.87 (0.15) | TBD         | 0.19M      |
+
+For the epicardium:
+
+| **Method**       | **Train**   | **Val**     | **Test**    | **Params** |
+| :--------------- | :---------- | :---------- | :-------    | :--------- |
+| Human            | 0.95 (0.05) | --          | --          | --         |
+| FCN (Tran 2017)  | --          | --          | 0.86 (0.20) | ~11M       |
+| U-net            | 0.93 (0.07) | 0.86 (0.17) | TBD         | 1.9M       |
+| Dilated u-net    | 0.94 (0.05) | 0.90 (0.14) | TBD         | 3.7M       |
+| Dilated densenet | 0.94 (0.04) | 0.89 (0.15) | TBD         | 0.19M      |
+
+Typical learning curves are shown below. For all architectures, we used the
+adam optimizer with the default initial learning rate of $$10^{-3}$$ and
+trained for 500 epochs. Each image in the dataset was individually normalized
+by subtracting its mean and dividing by its standard deviation. We used the
+unweighted pixel-wise cross entropy as the loss function. Dropout was turned
+off, and pre-activation batch normalization was used only for the dilated
+densenet. The dilated densenet had a growth rate of 24. We used a batch size of
+32, except for the dilated densenet, which required a batch size of 3 on our
+16GB GPU due to memory constraints. In all cases, the validation loss plateaus
+and does not exhibit an upturn characteristic of overfitting.
 
 ![learning-curves](/images/learning-curves-aaug.png)
 
-We use the adam optimizer and train for at least 500 epochs. The dataset was
-normalized by subtracting each image by its mean and dividing by its standard
-deviation.
+On a per epoch basis, we were astounded to find that the dilated densenet
+learns extremely quickly relative to the u-net and dilated u-net, likely
+because the dense connections facilitate gradient propagation. It is also
+extremely parameter efficient, reaching state of the art performance with
+60$$\times$$ less parameters than the FCN.
 
-## Future: two directions
+In our results, as well as in the published literature, the accuracies exhibit
+large uncertainties. Boxplots show that for some images, the networks struggle
+to segment the RV to any extent:
 
-Likely as a result of my physics background, I've always been fascinated by how
-behavior arises as we change the *scale* on which we probe a system. My
-intuition is that dilated convolutions construct features at multiple length
-scales. However, as opposed to systems which are scale invariant, like an Ising
-model at its critical point,
+![boxplots](/images/boxplots-eaug.png)
+
+Examining the outliers, we find they mostly arise from apical slices (near the
+bottom tip) of the heart where the RV is difficult to identify.
+
+
+[Create box plot, then look at the points which have zero dice and create
+strategy to fix. Propose pre-training model on apical slices only.]
+
+[Quantify variation with dropout and batch norm]
+
+[Quantify variation with growth rate]
+
+[Quantify finishing with dice coefficient]
+
+## Summary and future directions
+
+I was happy to be able to create deep learning models that could perform at the
+state of the art in cardiac segmentation. Here are my opinions on future
+directions:
+
+* Explore models with greater expressive power to reduce bias, creating
+  additional "breathing room" to reduce variance and improve performance.
+* Perhaps pretrain model on subset of data consisting of apical slices, or more
+  strongly weight this data, to avoid failure on outliers.
+* Explore quasi-3D models where the entire stack of registered cardiac slices
+  are simultaneously fed into the model.
+* Explore multistep (localization, registration, segmentation) pipelines.
+* In developing a production system, we will need to optimize for the final
+  figure of merit, which is the systolic and diastolic right ventricle volumes,
+  rather than the dice coefficients of the individual slices.
+
+Regarding model architectures, I was astounded by the parameter efficiency and
+accuracy of dilated densenets, and I am particularly excited to see how well
+they perform on standard segmentation tasks.
+
+* Explore dilated densenet architectures: additional convolutional layers at
+  each scale, or a mirror stack of convolution layers with dilation factors may
+  help performance.
+* Memory efficient dilated densenets: densely connected networks are notorious
+  for requiring immense ammounts of memory. The raw TensorFlow is particularly
+  egregious, limiting us to 8 layers with a batch size of 3 images on a 16GB
+  GPU. Switching to the recently-proposed memory efficient implementation
+  [[8](https://arxiv.org/abs/1707.06990)], would allow for deeper
+  architectures.
 
 ## About this project
 
-The [Insight Artificial Intelligence Fellows Program](http://insightdata.ai) is
-an intense, 7-week experience where fellows already possessing deep technical
-expertise are provided an environment to bridge the small skills gap needed to
-enter the AI field. A major component of bridging that gap involves completing
-a project in deep learning in order to gain hands-on experience in AI.
+The Insight AI Fellows Program is an intense, 7-week experience where fellows
+already possessing deep technical expertise are provided an environment to
+bridge the small skills gap needed to enter the AI field. A major component of
+bridging that gap involves completing a project in deep learning in order to
+gain hands-on experience in AI.
 
 As a relative novice to deep learning, I approached project selection like a
 new graduate student: choose a clearly motivated and well scoped problem that
