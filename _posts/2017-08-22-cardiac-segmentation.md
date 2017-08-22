@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Cardiac MRI Segmentation"
+title: Cardiac MRI Segmentation
 published: true
 mathjax: true
 ---
@@ -321,7 +321,7 @@ outlier for the dilated densenet on the validation set:
 ![val-bad](/images/val-0.000-dilated-densenet.png)
 
 The right ventricle is barely visible in the original image and the ground
-truth mask is quite small in area. Compare that to a relatively succesful
+truth mask is quite small in area. Compare that to a relatively successful
 segmentation:
 
 ![val-ok](/images/val-0.731-dilated-densenet.png)
@@ -394,4 +394,3 @@ densenets.
 
 The code is available on github
 [here](https://github.com/chuckyee/cardiac-segmentation).
-
