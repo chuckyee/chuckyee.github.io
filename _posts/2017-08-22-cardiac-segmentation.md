@@ -315,23 +315,42 @@ to segment the RV to any extent:
 ![boxplots](/images/boxplots-eaug.png)
 
 Examining the outliers, we find they mostly arise from apical slices (near the
-bottom tip) of the heart where the RV is difficult to identify.
+bottom tip) of the heart where the RV is difficult to identify. This is the
+outlier for the dilated densenet on the validation set:
 
+![val-bad](/images/val-0.000-dilated-densenet.png)
 
-[Create box plot, then look at the points which have zero dice and create
-strategy to fix. Propose pre-training model on apical slices only.]
+The right ventricle is barely visible in the original image and the ground
+truth mask is quite small in area. Compare that to a relatively succesful
+segmentation:
 
-[Quantify variation with dropout and batch norm]
+![val-ok](/images/val-0.731-dilated-densenet.png)
 
-[Quantify variation with growth rate]
+or even an easy case:
 
-[Quantify finishing with dice coefficient]
+![val-good](/images/val-0.971-dilated-densenet.png)
+
+Understanding how humans segment such apical slices would help provide
+intuition of how to improve performance.
+
+Finally, we summarize the effects of various hyperparameters:
+* Both dropout (with 0.2 and 0.5 probabilities) and batch normalization
+  decreased the performance of the u-net and dilated u-net.
+* Reweighting to emphasize the RV pixels relative to the background reduced
+  model performance.
+* Training using the soft dice loss did not improve accuracy.
+* Increasing the growth rate from 12 to 24 to 32 in the dilated densenet
+  systematically improved model performance, but the gains level off around the
+  24 mark.
 
 ## Summary and future directions
 
-I was happy to be able to create deep learning models that could perform at the
-state of the art in cardiac segmentation. Here are my opinions on future
-directions:
+Even in regimes with small datasets, appropriately chosen deep learning models
+combined with data augmentation are able to perform at state of the art,
+matching the results of conventional shape-based and machine learning
+approaches (see reported dice coefficients in Table 3 of
+[[9](https://link.springer.com/article/10.1007/s10334-015-0521-4)]). To build
+upon these results, we can:
 
 * Explore models with greater expressive power to reduce bias, creating
   additional "breathing room" to reduce variance and improve performance.
@@ -344,9 +363,9 @@ directions:
   figure of merit, which is the systolic and diastolic right ventricle volumes,
   rather than the dice coefficients of the individual slices.
 
-Regarding model architectures, I was astounded by the parameter efficiency and
-accuracy of dilated densenets, and I am particularly excited to see how well
-they perform on standard segmentation tasks.
+Regarding model architectures, I was excited by the parameter efficiency and
+accuracy of dilated densenets, and I am particularly interested to see how well
+they perform on benchmark segmentation tasks.
 
 * Explore dilated densenet architectures: additional convolutional layers at
   each scale, or a mirror stack of convolution layers with dilation factors may
@@ -369,6 +388,10 @@ gain hands-on experience in AI.
 As a relative novice to deep learning, I approached project selection like a
 new graduate student: choose a clearly motivated and well scoped problem that
 could be tackled in 4 weeks. I deliberately selected a project with small a
-dataset to allow me to quickly iterate and gain experience. I'm happy that this
-project met those goals and provided the intellectual playground to come up
-with dilated densenets.
+dataset to allow me to quickly iterate and gain experience. This project met
+those goals and provided the intellectual playground to come up with dilated
+densenets.
+
+The code is available on github
+[here](https://github.com/chuckyee/cardiac-segmentation).
+
