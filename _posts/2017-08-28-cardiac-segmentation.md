@@ -401,7 +401,7 @@ I'll end with some thoughts for the future:
 * Optimize for the ejection fraction, the final figure of merit, in a
   production system.
 * Memory-efficient dilated densenets: densely connected networks are notorious
-  for requiring immense ammounts of memory. The raw TensorFlow is particularly
+  for requiring immense amounts of memory. The raw TensorFlow is particularly
   egregious, limiting us to 8 layers with a batch size of 3 images on a 16GB
   GPU. Switching to the recently-proposed memory efficient implementation
   [[10](https://arxiv.org/abs/1707.06990)], would allow for deeper
