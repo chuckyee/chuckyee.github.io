@@ -10,13 +10,16 @@ for up to a century without failure. One of the key ways to measure how well
 your heart is functioning is to compute its [ejection
 fraction](https://en.wikipedia.org/wiki/Ejection_fraction): after your heart
 relaxes at its diastole to fully fill with blood, what percentage does it pump
-out upon contracting to its systole? Getting at this metric relies on
-*segmenting* (delineating the area) of the ventricles from cardiac images.
+out upon contracting to its systole? The first step of getting at this metric
+relies on *segmenting* (delineating the area) of the ventricles from cardiac
+images.
 
 During my time at the [Insight AI Program](http://insightdata.ai) in NYC, I
 decided to tackle the [right ventricle segmentation
 challenge](http://ai-on.org/projects/cardiac-mri-segmentation.html) from the
-calls for research hosted by the [AI Open Network](http://ai-on.org/).
+calls for research hosted by the [AI Open Network](http://ai-on.org/). I
+managed to achieve state of the art results with over an order of magnitude
+less parameters; below is a brief account of how.
 
 ## Problem description
 
@@ -65,29 +68,30 @@ right ventricle or the background.
 
 ## The dataset
 
-The biggest challenge facing the implementation of a deep learning model is the
+The biggest challenge facing a deep learning approach to this problem is the
 small size of the dataset. The dataset (accessible
 [here](http://www.litislab.fr/?sub_project=how-to-download-the-data)) contains
 only 243 physician-segmented images like those shown above drawn from the MRIs
 of 16 patients. There are 3697 additional unlabeled images, which may be useful
-for unsupervised or semi-supervised techniques, but we set those aside in this
-work. The images are 216$$\times$$256 pixels in size.
+for unsupervised or semi-supervised techniques, but I set those aside in this
+work since this was a supervised learning problem. The images are
+216$$\times$$256 pixels in size.
 
 Given the small dataset, one would suspect generalization to unseen images
 would be hopeless! This unfortunately is the typical situation in medical
-settings where labeled data is expensive to come by. The standard procedure is
-to apply affine transformations to the data: random rotations, translations,
-zooms and shears. We also implemented elastic deformations, which locally
-stretch and compress the image
+settings where labeled data is expensive and hard to come by. The standard
+procedure is to apply affine transformations to the data: random rotations,
+translations, zooms and shears. In addition, I implemented elastic
+deformations, which locally stretch and compress the image
 [[2](https://www.microsoft.com/en-us/research/publication/best-practices-for-convolutional-neural-networks-applied-to-visual-document-analysis/)].
 
 ![data-augmentation](/images/data-augmentation.png)
 
-The goal is the prevent the network from memorizing just the training examples,
-and to force it to learn that the RV is a solid, crescent-shaped object that
-can appear in a variety of orientations. In our training framework, we apply
-the transformations on the fly so the network sees new random transformations
-during each epoch.
+The goal of such augmentations is to prevent the network from memorizing just
+the training examples, and to force it to learn that the RV is a solid,
+crescent-shaped object that can appear in a variety of orientations. In our
+training framework, we apply the transformations on the fly so the network sees
+new random transformations during each epoch.
 
 As is also common, there is a large class imbalance since most of the pixels
 are background. Normalizing the pixel intensities to lie between 0 and 1, we
@@ -96,14 +100,14 @@ cavity.
 
 ![pixel-stats](/images/pixel-statistics.png)
 
-In constructing our loss functions, we experimented with reweighting schemes to
-balance the class distributions, but ultimately found that a simple average
-performed best.
+In constructing the loss functions, I experimented with reweighting schemes to
+balance the class distributions, but ultimately found that the unweighted
+average performed best.
 
-During training, we split out 20% of the images as a validation set. The
+During training, 20% of the images were split out as a validation set. The
 organizers of the RV segmentation challenge have a separate test set consisting
 of another 514 MRI images derived from a separate set of 32 patients, for which
-we submit predicted contours for evaluation.
+I submitted predicted contours for final evaluation.
 
 Let's look at model architectures.
 
@@ -111,14 +115,14 @@ Let's look at model architectures.
 
 Since we only had a 4 week timeframe to complete our projects at Insight, I
 wanted to get a baseline model up and running as quickly as possible. I chose
-to implement the u-net, proposed by Ronneberger, Fischer and Brox
+to implement a u-net model, proposed by Ronneberger, Fischer and Brox
 [[3](https://link.springer.com/chapter/10.1007/978-3-319-24574-4_28)], since it
-had been quite successful in biomedical segmentation tasks. (Interested
-readers: here are reviews for CNN [[4](https://arxiv.org/abs/1701.03056)] and
-conventional
-[[5](https://link.springer.com/article/10.1007/s10334-015-0521-4)]
-approaches.) The authors were able to train their network with only *30 images*
-by using aggressive image augmentation combined with pixel-wise reweighting.
+had been quite successful in biomedical segmentation tasks. U-net models are
+promising, as the authors were able to train their network with only *30
+images* by using aggressive image augmentation combined with pixel-wise
+reweighting. (Interested readers: here are reviews for CNN
+[[4](https://arxiv.org/abs/1701.03056)] and conventional
+[[5](https://link.springer.com/article/10.1007/s10334-015-0521-4)] approaches.)
 
 The u-net architecture consists of a contracting path, which collapses an image
 down into a set of high level features, followed by an expanding path which
@@ -140,7 +144,7 @@ convolutions (as opposed to unpadded) to keep the images the same size. The
 model was implemented in Keras.
 
 The u-net did not take long to implement and benchmark, so there was time to
-explore novel architectures. I'll present the other two architectures I
+explore novel architectures. I'll present the two other architectures I
 developed before jumping to aggregated results for all three models.
 
 ## Dilated u-nets: global receptive fields
@@ -151,8 +155,8 @@ the deepest part of the u-net only had receptive fields that spanned
 68$$\times$$68 pixels. No part of the network could "see" the entire image and
 integrate global context in producing the segmentation mask. The reasoning is
 that the network would have no understanding that there is only one right
-ventricle in a human, and it misclassifies the blob marked with an arrow in the
-following image:
+ventricle in a human. For example, it misclassifies the blob marked with an
+arrow in the following image:
 
 ![receptive-field-unet](/images/receptive-field-unet.png)
 
@@ -366,7 +370,7 @@ outlier for the dilated densenet on the validation set:
 ![val-bad](/images/val-0.000-dilated-densenet.png)
 
 The right ventricle is barely visible in the original image and the ground
-truth mask is quite small in area. Compare that to a relatively succesful
+truth mask is quite small in area. Compare that to a relatively successful
 segmentation:
 
 ![val-ok](/images/val-0.731-dilated-densenet.png)
