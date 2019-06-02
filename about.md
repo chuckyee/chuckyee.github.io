@@ -5,4 +5,4 @@ permalink: /about/
 published: true
 ---
 
-Physicist transitioning to a career in machine intelligence.
+AI Research Engineer in New York, NY.
