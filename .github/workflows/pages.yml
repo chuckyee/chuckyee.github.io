@@ -22,7 +22,7 @@ jobs:
 
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "3.3"
+          # ruby-version omitted: reads .ruby-version, the single source of truth
           bundler-cache: true
 
       - id: pages
