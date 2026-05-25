@@ -8,9 +8,9 @@ A personal blog (chuckyee.github.io) built on Jekyll and hosted by GitHub Pages.
 
 ## Deployment
 
-Built and deployed by **GitHub Actions**, not by GitHub Pages' built-in Jekyll runner. The workflow at `.github/workflows/pages.yml` runs on every push to `main`: it sets up Ruby 3.3 via `ruby/setup-ruby@v1`, runs `bundle exec jekyll build`, and publishes via `actions/deploy-pages@v5`.
+Built and deployed by **GitHub Actions**, not by GitHub Pages' built-in Jekyll runner. The workflow at `.github/workflows/pages.yml` runs on every push to `main`: it sets up Ruby (version read from `.ruby-version`) via `ruby/setup-ruby@v1`, runs `bundle exec jekyll build`, and publishes via `actions/deploy-pages@v5`.
 
-This means the site is **not** locked to the `github-pages` gem's pinned Jekyll/Ruby versions. The Gemfile depends directly on `jekyll ~> 4.4` and the plugins this site uses (`jekyll-feed`, `jekyll-sitemap`). To upgrade Ruby or Jekyll, bump the version in `pages.yml` and/or the Gemfile — that is the single source of truth.
+This means the site is **not** locked to the `github-pages` gem's pinned Jekyll/Ruby versions. The Gemfile depends directly on `jekyll ~> 4.4` and the plugins this site uses (`jekyll-feed`, `jekyll-sitemap`). To upgrade Ruby, edit `.ruby-version` (both local rbenv and `ruby/setup-ruby` in CI read it). To upgrade Jekyll, edit the Gemfile constraint.
 
 One-time repo setting (does not live in code): Settings → Pages → Source must be set to **"GitHub Actions"** (not "Deploy from a branch") for this workflow to publish.
 
@@ -25,7 +25,9 @@ Open **http://localhost:4000/**.
 
 Always use `bundle exec` so the in-repo Gemfile's Jekyll version is used. The `_site/`, `vendor/`, `.bundle/`, and `Gemfile.lock` paths are gitignored — don't commit them.
 
-Local Ruby: on macOS, the system Ruby (`/usr/bin/ruby`) is too old. Use Homebrew Ruby (`/opt/homebrew/opt/ruby/bin`) and put it on `PATH` before invoking `bundle`. If a deeper Ruby version mismatch ever bites locally, the CI workflow's `ruby-version: "3.3"` is the version GitHub Pages renders with — match it locally if needed.
+Local Ruby is managed by **rbenv**. The `.ruby-version` file at the repo root pins the required version (currently 3.4.9). If you have rbenv shell integration set up (`eval "$(rbenv init - bash)"` in `~/.bashrc`), `cd`ing into the repo auto-switches. If you don't yet have that Ruby installed: `rbenv install $(cat .ruby-version)`.
+
+CI reads the same `.ruby-version` file via `ruby/setup-ruby@v1`, so local and prod build against the same Ruby.
 
 ## Authoring posts
 
