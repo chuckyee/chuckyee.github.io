@@ -124,6 +124,10 @@ th, td {
   border: 1px solid #cccccc;
 }
 
+th {
+  background-color: #f2f2f2;
+}
+
 // Fixes images in popup boxes from Google Translate
 .gmnoprint img {
   max-width: none;
