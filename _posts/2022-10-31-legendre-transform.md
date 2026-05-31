@@ -154,10 +154,10 @@ following: given the input $$F(x)$$
 In summary, this is the prescription for finding the Legendre transform:
 
 $$\boxed{
-\begin{gather}
+\begin{gather*}
   G(p) = p \, f^{-1}(p) - F(f^{-1}(p)) \\
   \text{where } f = F' \text{ and } f^{-1} \text{ is obtained by inverting } p = f(x)
-\end{gather}
+\end{gather*}
 }$$
 
 Now we can answer the question of whether the Legendre transform of $$F(x) =
@@ -297,7 +297,7 @@ to express the height of the triangle: "the height of the triangle is equal to
 the slope $$p$$ times the width $$x$$, or equivalently, the sum of the line
 segments $$F$$ and $$G$$".
 
-Now switch to the plot the derivative $$p = f(x)$$. What does the triangle
+Now switch to the plot of the derivative $$p = f(x)$$. What does the triangle
 (specifically the height of the triangle) become?
 
 ![](/images/legendre/lengths-vs-areas.png)
@@ -343,16 +343,15 @@ Physicists will often abuse notation and write the duality between the
 derivatives as
 
 $$\boxed{
-\begin{align}
+\begin{align*}
   \frac{dF}{dx} &= p \\
   \frac{dG}{dp} &= x
-\end{align}
+\end{align*}
 }$$
 
 Yes, it doesn't tell you when $$p$$ and $$x$$ are acting as functions or as
-variables, but the equations sure are symmetric! This duality is useful because
-it allows us to construct families of potentials in physical applications. For
-a system, if $$x$$ is the independent variable
+variables, but the equations sure are symmetric! Physicists like things that
+look pretty even if they aren't mathematically rigorous.
 
 > I've simplified the arguments by choosing a function $$F(x)$$ which both
 > passes through the origin and has zero slope at the origin. You can check
@@ -360,19 +359,99 @@ a system, if $$x$$ is the independent variable
 > constant of integration and the integration limits, continues to work for
 > more general functions satisfying neither of those conditions.
 
+## Differential form
+
+The derivative equations points the way to differential forms physicists like
+to write. Start from the definition $$G(p) = p\,x - F(x)$$, where $$x$$ is
+understood to be the function $$x(p) = f^{-1}(p)$$. Take the differential of
+both sides:
+
+$$ dG = p\,dx + x\,dp - dF $$
+
+
+
+
+Go back to the $$p$$-$$x$$ diagram and imagine making a small change to
+the 
+
+How do differentials behave? Imagine making a small change $$dx$$
+
+Imagine making a small change in the height of the
+triangle $$d(px)$$. Using the product rule gives $$d(px) = p\,dx + x\,dp$$
+
+![](/images/legendre/differentials.png)
+
+---
+
+It turns out a useful quantity to examine is the derivative of $$g(p)$$. A
+straightforward calculation gives the answer:
+
+$$ \begin{align}
+   \frac{dg}{dp} &= \frac{d}{dp} [ p\,x(p) - f(x(p)) ] \\
+                 &= x(p) + p \, \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp} \\
+                 &= x(p)
+   \end{align}$$
+
+The derivative of the Legendre transform is the original independent variable
+$$x$$.
+
+Going back to differentials, what happens when we have a function $$f(x,y)$$ of
+multiple variables and transform just one of them?
+
+$$df = p\,dx + q\,dy$$
+
+$$dg = x\,dp - q\,dy$$
+
+The second term acquires a minus sign. The spectator variables aren't left
+alone (why is this important?). Example:
+
+$$f(x, y) = x^2 + y^2$$
+
+$$g(p, y) = \frac{p^2}{4} - y^2$$
+
+We went from a paraboloid to a hyperbolic paraboloid. Again, why is this
+important?
+
+$$df + dg = p\,dx + x\,dp$$
+
+[Relationship with Laplace transform via saddle point]
+
+xBehavior of differentials:
+
+$$df = p \, dx \quad \text{where } p = \frac{df}{dx}$$
+
+What about the differential of $$g$$?
+
+$$dg = x\,dp + p \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp}$$
+
+The last two terms cancel, and we find
+
+$$dg = x\,dp$$
+
+Point is the slope of the Legendre transform is the original independent
+variable $$x$$.
+
+
+
 I can't pass up showing you one more surprising connection the Legendre
 transform has to integral calculus before moving to physics.
 
-# Integration of inverse functions
+## Integration of inverse functions
 
 Back in 1905, the mathematician Charles-Ange Laisant published a short article
 titled "Integration of Inverse Functions". In it, he posed a simple question:
-given a function $$y = f(x)$$ which has an inverse $$x = g(y)$$, what is the
-integral of $$g$$?
+given a function $$y = f(x)$$ which has an inverse $$x = \phi(y)$$, what is the
+integral of $$\phi$$?
+
+![](/images/legendre/laisant-1905-definitions.png){: width="500"}
 
 Given the simplicity of the question, he wrote that he "could hardly believe
-that this theorem is new." Defining $$F(x) = \int dx\, f(x)$$ and $$G(x) = \int
-dx\, g(x)$$, Laisant showed that
+that this theorem is new." Laisant showed that
+
+![](/images/legendre/laisant-1905-result.png){: width="500"}
+
+which when translated to our notational convention ($$\phi \rightarrow g$$ and
+$$\Phi \rightarrow G$$) is
 
 $$ G(x) = x\, g(x) - F(g(x)) $$
 
@@ -383,15 +462,26 @@ of its derivative.
 
 Another of the proofs provided by Laisant uses integration by parts:
 
-$$ \int\! f(x)\, dx = x\, f(x) - \int\! x\, df(x) = x\, f(x) - \int\! g(p)\, dp $$
+$$
+\begin{align*}
+  \int\! f(x)\, dx &= x\, f(x) - \int\! x\, df(x) \\
+                   &= x\, f(x) - \int\! g(p)\, dp
+\end{align*}
+$$
 
 where we eliminated the differential $$df$$ by substituting $$p = f(x)$$ in the
 second integral and used $$x = g(p)$$. Using the notation for the
 antiderivatives:
 
-$$ F(x) = x\, f(x) - G(p) = x\, f(x) - G(f(x)) $$
+$$
+\begin{align*}
+  F(x) &= x\, f(x) - G(p) \\
+       &= x\, f(x) - G(f(x))
+\end{align*}
+$$
 
-which is the same formula above.
+which is the same formula above if we swap $$f \leftrightarrow g$$ and
+$$F \leftrightarrow G$$.
 
 Here's an example of the formula in action. Given:
 
@@ -476,66 +566,6 @@ $$\dot{q}_i(t)$$.
 steps is to derive the
 Lagrangian by imagining small displacements in the coordinates of a system. The
 result is a functional that takes as input a function 
-
----
-
-How do differentials behave? Imagine making a small change $$dx$$
-
-Imagine making a small change in the height of the
-triangle $$d(px)$$. Using the product rule gives $$d(px) = p\,dx + x\,dp$$
-
-![](/images/legendre/differentials.png)
-
----
-
-It turns out a useful quantity to examine is the derivative of $$g(p)$$. A
-straightforward calculation gives the answer:
-
-$$ \begin{align}
-   \frac{dg}{dp} &= \frac{d}{dp} [ p\,x(p) - f(x(p)) ] \\
-                 &= x(p) + p \, \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp} \\
-                 &= x(p)
-   \end{align}$$
-
-The derivative of the Legendre transform is the original independent variable
-$$x$$.
-
-Going back to differentials, what happens when we have a function $$f(x,y)$$ of
-multiple variables and transform just one of them?
-
-$$df = p\,dx + q\,dy$$
-
-$$dg = x\,dp - q\,dy$$
-
-The second term acquires a minus sign. The spectator variables aren't left
-alone (why is this important?). Example:
-
-$$f(x, y) = x^2 + y^2$$
-
-$$g(p, y) = \frac{p^2}{4} - y^2$$
-
-We went from a paraboloid to a hyperbolic paraboloid. Again, why is this
-important?
-
-$$df + dg = p\,dx + x\,dp$$
-
-[Relationship with Laplace transform via saddle point]
-
-xBehavior of differentials:
-
-$$df = p \, dx \quad \text{where } p = \frac{df}{dx}$$
-
-What about the differential of $$g$$?
-
-$$dg = x\,dp + p \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp}$$
-
-The last two terms cancel, and we find
-
-$$dg = x\,dp$$
-
-Point is the slope of the Legendre transform is the original independent
-variable $$x$$.
-
 
 # Maximizing entropy
 
