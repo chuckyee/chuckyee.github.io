@@ -551,8 +551,16 @@ def differentials():
     plt.text(p(1) / 2, -0.05, "p", va="top", ha="center")
     plt.text(-0.05, 1 + dx / 2, "dx", va="center", ha="right")
     plt.text(p(1) + dp / 2, -0.05, "dp", va="top", ha="center")
-    plt.text(p(1) + dp + eps, 1 / 2, "dG", va="center", ha="left")
-    plt.text(p(1) / 2, 1 + dx, "dF", va="bottom", ha="center")
+    plt.text(p(1) * 0.35, 1 / 2 + 3*dx, "F", va="center", ha="center")
+    plt.text(p(1) * 0.65, 1 / 2 - 3*dx, "G", va="center", ha="center")
+    plt.annotate("dF", xy=(p(1) / 2, 1 + dx / 2),
+                 xytext=(p(1) / 2, 1.25),
+                 va="bottom", ha="center",
+                 arrowprops=dict(arrowstyle="->", color="black"))
+    plt.annotate("dG", xy=(p(1) + dp / 2, 1 / 2),
+                 xytext=(1.45, 1 / 2),
+                 va="center", ha="left",
+                 arrowprops=dict(arrowstyle="->", color="black"))
 
     plt.xticks([0, 1])
     plt.yticks([0, 1])
@@ -610,6 +618,6 @@ with plt.xkcd():
     # legendre_double_well()
     # single_valued()
     # lengths_vs_areas()
-    lengths_vs_areas_flipped()
-    # differentials()
+    # lengths_vs_areas_flipped()
+    differentials()
     # arctanh_integral()

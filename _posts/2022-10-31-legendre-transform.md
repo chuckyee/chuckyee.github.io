@@ -44,8 +44,9 @@ a point on the parabola, say $$(1, 1)$$, and draw the tangent line:
 
 ![](/images/legendre/parabola-one-tangent.png)
 
-One way to describe this particular tangent line is by its slope and
-$$y$$-intercept, which are $$2$$ and $$-1$$ respectively. It's formula is
+One way to describe this particular tangent line is by its slope $$p$$ and
+$$y$$-intercept $$-G$$, which are $$2$$ and $$-1$$ respectively. (I'll explain
+why we use the *negative* of the $$y$$-intercept further down.) It's formula is
 
 $$y = 2x - 1$$
 
@@ -56,9 +57,8 @@ $$-\frac{1}{4}$$, so the formula for this second tangent line is
 $$y = x - \frac{1}{4}$$
 
 Imagine repeating this process for a bunch of points on the curve and
-tabulating the slopes, which I'll call $$p$$, and for reasons I'll explain
-further down, the *negative* of the $$y$$-intercepts $$G$$. The result is a
-table like this:
+tabulating the slopes, which I'll call $$p$$, and the negative of the
+$$y$$-intercepts $$G$$. The result is a table like this:
 
 | $$x$$ | $$F$$ | $$p$$ | $$G$$ |
 | ----- | ----- | ----- | ----- |
@@ -106,7 +106,7 @@ of the tangent lines?
 The trick is to consider the right triangle formed by the points on the
 function $$F$$ and the negative $$y$$-intercept $$G$$:
 
-![](/images/legendre/tangent-triangle.png)
+![](/images/legendre/tangent-triangle.png){: width="450"}
 
 Adding up the length of the two vertical line segments, the height of the
 triangle is $$F+G$$. The width is $$x$$. The slope $$p$$ of the triangle is
@@ -131,10 +131,10 @@ around and not be an involution.
 > Aside: not everyone defines the Legendre transform this way, so pay attention
 > to minus sign conventions in the literature.
 
-One other property to note is that if they were phyiscal quantities, the
+One other property to note is that if they were physical quantities, the
 Legendre transform $$G$$ must have the same units as $$F$$. For example, if
 $$F$$ had units of energy, then $$G$$ must also be a measure of energy.
-Likewise, the product $$p x$$ must also have units of energy. [How does this
+Likewise, the product $$p\,x$$ must also have units of energy. [How does this
 relate to $$p$$ and $$x$$ being conjugate variables? What's the definition of a
 conjugate variable and what physical process do they represent?]
 
@@ -149,7 +149,7 @@ following: given the input $$F(x)$$
 
 1. Find the tangent line slopes by taking the derivative $$p = f(x) \equiv F'(x)$$
 2. Invert this equation to get $$x = f^{-1}(p)$$.
-3. Insert into the expression $$p x - F(x)$$ to eliminate $$x$$ in favor of $$p$$
+3. Insert into the expression $$p\,x - F(x)$$ to eliminate $$x$$ in favor of $$p$$
 
 In summary, this is the prescription for finding the Legendre transform:
 
@@ -181,14 +181,14 @@ something that is maximized in Nature (hint, it has to do with the second law
 of thermodynamics).
 
 Going back to the plot of our curve (solid green), pick a value of the slope
-$$p$$ and draw the line $$y = px$$ passing through the origin (solid blue).
+$$p$$ and draw the line $$y = p\,x$$ passing through the origin (solid blue).
 Then draw the tangent line with slope $$p$$ (dotted grey). The vertical
 distance between the two lines is the $$y$$-intercept $$G$$. Here's the key
 point: as we slide along the plot horizontally, the signed distance from the
-curve $$F(x)$$ to the line $$y = px$$ reaches a maximum at the tangent point
+curve $$F(x)$$ to the line $$y = p\,x$$ reaches a maximum at the tangent point
 (orange segment) and is exactly equal to the $$y$$-intercept $$G$$.
 
-Put another way, if we plot $$px - F(x)$$ as a function of $$x$$, its maximum
+Put another way, if we plot $$p\,x - F(x)$$ as a function of $$x$$, its maximum
 value is $$G$$.
 
 ![](/images/legendre/legendre-supremum.png)
@@ -278,9 +278,28 @@ could play the role as the independent variable.
 >
 > See the next section!
 
+As an aside, if the goal is to recast a function $$F(x)$$ in terms of the its
+derivative $$p$$, what's wrong with using $$F(x(p))$$? We could construct such
+a function but it would not be the Legendre transform (although they are equal
+in some special cases). Moreover information is lost: take for example the
+shifted parabola
+
+$$ F(x) = \frac{1}{2} (x - a)^2 $$
+
+The derivative is $$p = x - a \implies x = p + a$$ which when substituted gives
+
+$$ F(x(p)) = \frac{1}{2} p^2 $$
+
+The constant $$a$$ has disappeared entirely and cannot be recovered. In
+contrast, the Legendre transform is
+
+$$ G(p) = \frac{1}{2} p^2 + a\,p $$
+
+which retains information about the shift $$a$$.
+
 In the past three sections, we've explored the Legendre transform from the
 perspective of duality for plane curves: the mapping between points and tangent
-lines. In the following, I want to move from derivatives to integrals and
+lines. In the following, let's move from derivatives to integrals and
 reinterpret the construction in terms of areas. This will give us a beautifully
 symmetric view on the Legendre transform and lead to a connection to integrals
 of inverse functions.
@@ -302,7 +321,7 @@ Now switch to the plot of the derivative $$p = f(x)$$. What does the triangle
 
 ![](/images/legendre/lengths-vs-areas.png)
 
-In the $$p$$-$$x$$ axes, the three terms representing lengths become areas:
+In the $$p$$-$$x$$ axes, the three terms become areas:
 
 1. The height of the triangle $$p \, x$$ becomes a *rectangle* with dimensions
    $$x \times p$$.
@@ -359,41 +378,78 @@ look pretty even if they aren't mathematically rigorous.
 > constant of integration and the integration limits, continues to work for
 > more general functions satisfying neither of those conditions.
 
-## Differential form
+## Differential forms
 
-The derivative equations points the way to differential forms physicists like
-to write. Start from the definition $$G(p) = p\,x - F(x)$$, where $$x$$ is
-understood to be the function $$x(p) = f^{-1}(p)$$. Take the differential of
-both sides:
+There is another way to derive the derivative relations using differential
+forms. Given a function $F(x)$, its differential is
+
+$$ dF = f(x)\,dx = p\,dx $$
+
+What is the differential of its Legendre transform $G$? Start from the
+definition $$G(p) = p\,x - F(x)$$, where $$x$$ is understood to be the function
+$$x = g(p)$$. Take the differential of both sides:
 
 $$ dG = p\,dx + x\,dp - dF $$
 
+Since $$dF = f(x)\,dx = p\,dx$$, the two outer terms cancel, leaving
 
+$$ dG = x\,dp $$
 
+We have recovered the derivative property using differentials.
 
-Go back to the $$p$$-$$x$$ diagram and imagine making a small change to
-the 
+These manipulations have a simple geometric interpretation: go back to the
+$$p$$-$$x$$ diagram and imagine making a small change to the area of the
+$$p$$-by-$$x$$ rectangle.
 
-How do differentials behave? Imagine making a small change $$dx$$
+![](/images/legendre/differentials.png){: width="450"}
 
-Imagine making a small change in the height of the
-triangle $$d(px)$$. Using the product rule gives $$d(px) = p\,dx + x\,dp$$
+Starting from $F + G = p\,x$ and using the product rule for $d(p\,x)$ gives
 
-![](/images/legendre/differentials.png)
+$$ dF + dG = p\,dx + x\,dp $$
 
----
+The fact that $dF$ cancels with $p\,dx$ is a consequence of the fact that the
+variations $dx$ and $dp$ aren't independent: they are constrained to respect
+the curve $p = f(x)$, or equivalently $x = g(p)$.
 
-It turns out a useful quantity to examine is the derivative of $$g(p)$$. A
-straightforward calculation gives the answer:
+> I think it's illuminating to work out what the differential would have been
+> if we had worked with $F(x(p))$ instead. Denote this quantity $H(p)$ and take
+> its differential:
+>
+> $$ dH = \frac{dF}{dx} \frac{dx}{dp} dp = p \frac{dx}{dp} dp $$
+>
+> which is not the same as $dG = x\,dp$. They are different objects because $H$
+> measures the value of the function $F$ at the mapped point $x(p)$ while $G$
+> measures the intercept of the tangent line.
+>
+> Confusingly, sometimes $F(x(p))$ does equal the Legendre transform $G(p)$. To
+> discover when that occurs, solve the equation
+>
+> $$ F(x(p)) = p\,x(p) - F(x(p)) $$
+>
+> It's simpler to work with $x$ as the independent variable. Writing $p =
+> F'(x)$, we get
+>
+> $$ 2F(x) = x\,F'(x) $$
+>
+> This is a separable ordinary differential equation whose solution is
+>
+> $$ \log |F| = 2 \log |x| + C \quad \implies \quad F(x) = a\,x^2 $$
+>
+> where $a \neq 0$ is an arbitrary constant.
+>
+> Conclusion: all homogenous order-2 polynomials have the property that its
+> Legendre transform is equal to the value of the function when $x$ is mapped
+> to the slope $p$. Geometrically, this is the same as asking the question
+> "when do the partitions $F$ and $G$ of the $p$-by-$x$ rectangle have equal
+> area?" The answer is when the function $p = f(x)$ is a straight line through
+> the diagonal, which implies the original function must be a parabola passing
+> through the origin.
+>
+> Quadratic forms are common enough in physics (think the spring potential or
+> kinetic energy) that I've been confused by the equivalence of $F(x(p))$ and
+> $G(p)$ when working out calculations. Remember, it's only a special case.
 
-$$ \begin{align}
-   \frac{dg}{dp} &= \frac{d}{dp} [ p\,x(p) - f(x(p)) ] \\
-                 &= x(p) + p \, \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp} \\
-                 &= x(p)
-   \end{align}$$
-
-The derivative of the Legendre transform is the original independent variable
-$$x$$.
+The Legendre transform
 
 Going back to differentials, what happens when we have a function $$f(x,y)$$ of
 multiple variables and transform just one of them?
@@ -411,27 +467,6 @@ $$g(p, y) = \frac{p^2}{4} - y^2$$
 
 We went from a paraboloid to a hyperbolic paraboloid. Again, why is this
 important?
-
-$$df + dg = p\,dx + x\,dp$$
-
-[Relationship with Laplace transform via saddle point]
-
-xBehavior of differentials:
-
-$$df = p \, dx \quad \text{where } p = \frac{df}{dx}$$
-
-What about the differential of $$g$$?
-
-$$dg = x\,dp + p \frac{dx}{dp} - \frac{df}{dx} \frac{dx}{dp}$$
-
-The last two terms cancel, and we find
-
-$$dg = x\,dp$$
-
-Point is the slope of the Legendre transform is the original independent
-variable $$x$$.
-
-
 
 I can't pass up showing you one more surprising connection the Legendre
 transform has to integral calculus before moving to physics.
@@ -480,8 +515,11 @@ $$
 \end{align*}
 $$
 
-which is the same formula above if we swap $$f \leftrightarrow g$$ and
-$$F \leftrightarrow G$$.
+which is the same formula above if we swap $$f \leftrightarrow g$$ and $$F
+\leftrightarrow G$$. This proof is connected to our earlier use of the product
+rule in deriving the result of making small changes in the area of the
+$p$-by-$x$ rectangle: integration by parts is the product rule in integral
+form.
 
 Here's an example of the formula in action. Given:
 
@@ -512,9 +550,9 @@ naturally find application in physics, which we turn to next.
 
 In classical mechanics, we often want to know how a system will respond when we
 apply some perturbation. For example, given a spring, what is the restoring
-force when we stretch it an amount $$x - x_0$$ away from its equilibrium
-length? The experimentally determined relationship in the linear regime is $$F
-= -k\,(x-x_0)$$, termed Hooke's law.
+force when we stretch it an amount $$x$$ away from its equilibrium length? The
+experimentally determined relationship in the linear regime is $$F = -k\,x$$,
+termed Hooke's law.
 
 However, another way to answer this question is to introduce the concept of a
 potential energy $$V(x)$$ whose derivative with respect to $$x$$ tells us the
@@ -523,7 +561,7 @@ force:
 $$ F(x) = -\frac{dV(x)}{dx} $$
 
 For the case of a spring with spring constant $$k$$, the potential energy is
-$$V(x) = k(x-x_0)^2/2$$.
+$$V(x) = k\,x^2/2$$.
 
 > Note: the convention in physics is to compute the force of the potential
 > acting on the object, so there's an extra minus sign floating around which
@@ -543,7 +581,7 @@ $$ x(F) = -\frac{dW(F)}{dF} $$
 The potential $$W$$ is the Legendre transform of $$V$$, up to some minus signs!
 The answer for the mass attached to a spring is
 
-$$ W = \frac{F^2}{2k} - Fx_0 $$
+$$ W = \frac{F^2}{2k} $$
 
 > What physical quantity does $$W$$ measure? It has units of energy, and it is
 > the Legendre transform of the potential energy, so $$W$$ must be something
@@ -568,6 +606,8 @@ Lagrangian by imagining small displacements in the coordinates of a system. The
 result is a functional that takes as input a function 
 
 # Maximizing entropy
+
+[Relationship with Laplace transform via saddle point]
 
 For students of thermodynamics, you may remember being introduced to a quantity
 called the Helmholtz free energy, $$F = E - TS$$, and being told it is the
@@ -631,13 +671,9 @@ spring. [Wait, doesn't this involve a change in volume?]
 
 Questions:
 
-- How does Legendre transforms relate to derivatives and conjugate pairs? What
-  about units?
+- How does Legendre transforms relate to conjugate pairs?
 
-- What's wrong with using $$F(x(p))$$, where $$p = dF(x)/dx$$?
-
-- What is the differential form of the Legendre transform? How does it relate
-  to integration by parts or the product rule?
+- How does the Legendre transform behave in multivariate settings?
 
 - Ex: classical mechanics
 
@@ -673,6 +709,15 @@ Answered:
   Legendre transform an involution?
 
 - Why is there a convexity constraint?
+
+- What's wrong with using $$F(x(p))$$, where $$p = dF(x)/dx$$?
+
+- How does Legendre transforms relate to derivatives? What about units?
+
+- Why is it so easy to get tripped up when working with quadratic forms?
+
+- What is the differential form of the Legendre transform? How does it relate
+  to integration by parts or the product rule?
 
 Writer's notes:
 
