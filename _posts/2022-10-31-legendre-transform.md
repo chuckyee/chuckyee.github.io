@@ -197,9 +197,9 @@ This gives us a second definition for the Legendre transform:
 
 $$\boxed{G(p) = \max_x \{p\,x - F(x)\} \quad \text{for }F(x)\text{ convex up}}$$
 
-Operationally, when calculating the maximum over $$x$$, we'll end up computing
-the derivative of the argument $$p\,x - F(x)$$ and setting it to zero, which
-gives $$p = f(x)$$ as before.
+For differentiable functions, when calculating the maximum over $$x$$, we'll
+end up computing the derivative of the argument $$p\,x - F(x)$$ and setting it
+to zero, which gives $$p = f(x)$$ as before.
 
 > For concave down functions, the definition is $$G(p) = \min_x \{p\,x - F(x)\}$$.
 
@@ -248,12 +248,12 @@ example: a double well.
 
 ![](/images/legendre/legendre-double-well.png)
 
-The Legendre transform (technically the
-[Legendre-Fenchel](https://en.wikipedia.org/wiki/Convex_conjugate) transform in
-this more general case) becomes multi-valued. The two minima in $$F(x)$$ map
-onto the "X" crossing on the vertical axes in the $$G(p)$$ plot while the two
-cusps or "horns" in the transform correspond to the two points where $$F$$
-changes concavity.
+The Legendre transform (technically the Legendre-Fenchel transform or [convex
+conjugate](https://en.wikipedia.org/wiki/Convex_conjugate) in this more general
+case) becomes multi-valued. The two minima in $$F(x)$$ map onto the "X"
+crossing on the vertical axes in the $$G(p)$$ plot while the two cusps or
+"horns" in the transform correspond to the two points where $$F$$ changes
+concavity.
 
 As an aside, transforms of non-convex functions are related to convex hulls and
 the [Maxwell construction](https://en.wikipedia.org/wiki/Maxwell_construction),
@@ -273,16 +273,23 @@ The fact that the derivative $$p = f(x)$$ is single-valued means that it has an
 inverse $$x = g(p)$$. Choosing $$p$$ uniquely specifies $$x$$, and either one
 could play the role as the independent variable.
 
-> Is the derivative $$g = G'$$ of the Legendre transform equal to the inverse
-> of $$f$$, as the notation suggests?
+> I'll note that there is a vast literature on convex analysis which this essay
+> barely touches on. The extremization approach to constructing the transform
+> is more general, and can be applied to non-convex and non-differentiable
+> curves (functions with "kinks"). Werner Fenchel did foundational work on the
+> transform 140 years after Adrien-Marie Legendre introduced the basic
+> transform for differentiable convex functions in 1787.
+
+> Another note: is the derivative $$g = G'$$ of the Legendre transform equal to
+> the inverse of $$f$$, as the notation suggests?
 >
 > See the next section!
 
-As an aside, if the goal is to recast a function $$F(x)$$ in terms of the its
-derivative $$p$$, what's wrong with using $$F(x(p))$$? We could construct such
-a function but it would not be the Legendre transform (although they are equal
-in some special cases). Moreover information is lost: take for example the
-shifted parabola
+As a hypothetical, if the goal is to recast a function $$F(x)$$ in terms of the
+its derivative $$p$$, what's wrong with using $$F(x(p))$$? We could construct
+such a function but it would not be the Legendre transform (although they are
+equal in some special cases). Moreover information is lost: take for example
+the shifted parabola
 
 $$ F(x) = \frac{1}{2} (x - a)^2 $$
 
@@ -378,16 +385,21 @@ look pretty even if they aren't mathematically rigorous.
 > constant of integration and the integration limits, continues to work for
 > more general functions satisfying neither of those conditions.
 
-## Differential forms
+## Differential forms and multivariable settings
 
-There is another way to derive the derivative relations using differential
-forms. Given a function $F(x)$, its differential is
+There is another way to arrive at the derivative relations by using
+differential forms. These are particularly useful when generalizing to the
+multivariable case, which is typical in most physics applications, and I'll
+show those in the second half of this section.
 
-$$ dF = f(x)\,dx = p\,dx $$
+Starting with $F(x)$, write its differential
 
-What is the differential of its Legendre transform $G$? Start from the
-definition $$G(p) = p\,x - F(x)$$, where $$x$$ is understood to be the function
-$$x = g(p)$$. Take the differential of both sides:
+$$ dF = p\,dx \quad \text{where} \,\, p = \frac{dF}{dx} $$
+
+What is the differential of its Legendre transform $G$?
+
+Use its definition $$G(p) = p\,x - F(x)$$, where $$x$$ is understood to be the
+function $$x = g(p)$$. Take the differential of both sides:
 
 $$ dG = p\,dx + x\,dp - dF $$
 
@@ -395,7 +407,7 @@ Since $$dF = f(x)\,dx = p\,dx$$, the two outer terms cancel, leaving
 
 $$ dG = x\,dp $$
 
-We have recovered the derivative property using differentials.
+We have recovered the derivative property.
 
 These manipulations have a simple geometric interpretation: go back to the
 $$p$$-$$x$$ diagram and imagine making a small change to the area of the
@@ -421,8 +433,8 @@ the curve $p = f(x)$, or equivalently $x = g(p)$.
 > measures the value of the function $F$ at the mapped point $x(p)$ while $G$
 > measures the intercept of the tangent line.
 >
-> Confusingly, sometimes $F(x(p))$ does equal the Legendre transform $G(p)$. To
-> discover when that occurs, solve the equation
+> Confusingly, sometimes $F(x(p))$ does equal the Legendre transform $G(p)$.
+> When does this happen? The condition is $F = G$, which is
 >
 > $$ F(x(p)) = p\,x(p) - F(x(p)) $$
 >
@@ -437,7 +449,7 @@ the curve $p = f(x)$, or equivalently $x = g(p)$.
 >
 > where $a \neq 0$ is an arbitrary constant.
 >
-> Conclusion: all homogenous order-2 polynomials have the property that its
+> Conclusion: all homogenous quadratic forms have the property that its
 > Legendre transform is equal to the value of the function when $x$ is mapped
 > to the slope $p$. Geometrically, this is the same as asking the question
 > "when do the partitions $F$ and $G$ of the $p$-by-$x$ rectangle have equal
@@ -449,14 +461,75 @@ the curve $p = f(x)$, or equivalently $x = g(p)$.
 > kinetic energy) that I've been confused by the equivalence of $F(x(p))$ and
 > $G(p)$ when working out calculations. Remember, it's only a special case.
 
-The Legendre transform
+Let's move on to the multivariable case: what happens when we start with a
+function of two variables $F(x, y)$ and Legendre transform the first dimension
+$x$? Following the steps for the single-variable case, first write out the
+total differential for $F$:
 
-Going back to differentials, what happens when we have a function $$f(x,y)$$ of
-multiple variables and transform just one of them?
+$$ dF = p\,dx + q\,dy, \quad \text{where} \,\,
+   p = \frac{\partial F}{\partial x}, \,\, q = \frac{\partial F}{\partial y} $$
 
-$$df = p\,dx + q\,dy$$
+The partials $p = p(x, y)$ and $q = q(x, y)$ are functions of the original
+variables. The Legendre transform $G(p, y)$ has the total differential
 
-$$dg = x\,dp - q\,dy$$
+$$ dG = \frac{\partial G}{\partial p} dp + \frac{\partial G}{\partial y} dy $$
+
+since it is a function of $p$ and $y$. What are the expressions for its partial
+derivatives? Use the definition of the Legendre transform for $x
+\leftrightarrow p$ and compute
+
+$$
+\begin{align*}
+  dG &= d(p\,x - F) \\
+     &= p\,dx + x\,dp - p\,dx - q\,dy \\
+     &= x\,dp - q\,dy
+\end{align*}
+$$
+
+Equating the two expressions, the partials of $G$ are
+
+$$ \frac{\partial G}{\partial p} = x \quad \frac{\partial G}{\partial y} = -q $$
+
+The first equation is the same as the single-variable case, where $x = x(p, y)$
+is obtained by solving $p = p(x, y)$ for $x$. The second equation says that
+slopes in the direction of the "spectator" variable $y$ are flipped! Why?
+
+To develop intution for the sign flip, imagine a "slice" of the function
+$F(x,y_0)$ for fixed $y_0$. The transform is the usual $G(p,y_0)$. What happens
+when we take a small step in the $y$ direction? The slice of $F$ at $y_0 + dy$
+is shifted from the slice at $y_0$ by a small amount
+
+$$ F(x, y_0 + dy) \simeq F(x, y_0) + q(x, y_0)\,dy $$
+
+How does the shift $q(x, y_0)\,dy$ affect $G$?
+
+Intuition for the minus sign comes from two properties of the Legendre
+transform: locality and vertical shifts. The Legendre transform is local in the
+following manner: to compute the transform at a point $x$, we only need to know
+the value $F(x)$ and slope $p = F'(x)$. With those two pieces of information,
+we can draw the tangent line and fine the $y$-intercept $-G$. The transform
+does not depend on what happens elsewhere in the function. For example, I
+plotted three functions which all pass through the point $(x, F) = (1, 1)$ and
+have the same slope $p = 1$. The Legendre transform maps to $(p, G) = (1, 0)$
+and you can see all three transforms coincide.
+
+![](/images/legendre/legendre-locality-2.png)
+
+
+We can transform either of the variables individually, or both.
+
+We'll call them $G(p, y)$, $H(x, q)$, and $K(p, q)$.
+
+Running through the remaining cases gives us a table of all 4 functions:
+
+| function  | differential     |
+| --------- | ---------------- |
+| $F(x, y)$ | $ p\,dx + q\,dy$ |
+| $G(p, y)$ | $ x\,dp - q\,dy$ |
+| $H(x, q)$ | $-p\,dx + y\,dq$ |
+| $K(p, q)$ | $ x\,dp + y\,dq$ |
+
+
 
 The second term acquires a minus sign. The spectator variables aren't left
 alone (why is this important?). Example:
@@ -671,9 +744,9 @@ spring. [Wait, doesn't this involve a change in volume?]
 
 Questions:
 
-- How does Legendre transforms relate to conjugate pairs?
-
 - How does the Legendre transform behave in multivariate settings?
+
+- How does Legendre transforms relate to conjugate pairs?
 
 - Ex: classical mechanics
 
@@ -740,6 +813,8 @@ Writer's notes:
 [Munger](https://www.aapt.org/docdirectory/meetingpresentations/SM14/Mungan-Poster.pdf):
 mathematical exposition based on product rule
 
+[Kennerly](https://samkennerly.github.io/media/science/legendre_transform.pdf): graphical derivation
+
 [StackExchange](https://physics.stackexchange.com/questions/4384/physical-meaning-of-legendre-transformation):
 nice graphical representation of $$F + G = xy$$ and requirement of maintaining
 variational principles under change of conjugate variable pairs.
@@ -777,3 +852,6 @@ lecture notes providing concrete worked example of Helmholtz free energy for
 system with a spring connected to a gas piston.
 
 [Zia Legendre transform presentation](http://www.gatsby.ucl.ac.uk/tea/tea_archive/attached_files/Gatsby%20TeaTalk%20-%20Legendre%20Transform.pdf)
+
+[Legendre-Fenchel transforms in a nutshell](https://ise.ncsu.edu/wp-content/uploads/sites/9/2019/01/or706-LF-transform-1.pdf)
+Excellent review by Hugo Touchette

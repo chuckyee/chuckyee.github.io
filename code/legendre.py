@@ -571,6 +571,140 @@ def differentials():
     plt.savefig(IMGDIR / 'differentials.png', bbox_inches='tight')
 
 
+def legendre_locality():
+    config = LegendreAxesConfig(
+        xlim1=(-1.5, 2.5),
+        ylim1=(-0.5, 3.5),
+        xlim2=(-0.5, 3.5),
+        ylim2=(-2.0, 2.0),
+    )
+    fig, ax1, ax2 = setup_legendre_axes(config)
+
+    c1 = plt.cm.viridis(0.1)
+    c2 = plt.cm.viridis(0.45)
+    c3 = plt.cm.viridis(0.75)
+
+    # x-F (left) plot
+    ax1.axhline(0, color="lightgrey")
+    ax1.axvline(0, color="lightgrey")
+
+    # Common tangent line y = 1 + x at (0, 1)
+    xt = np.linspace(-1.5, 2.3, 21)
+    ax1.plot(xt, 1 + xt, ':', color='grey')
+
+    x = np.linspace(-1.5, 2.0, 201)
+    eps = 1e-3
+    xL = np.linspace(-1 + eps, 2.0, 201)
+
+    ax1.plot(x, np.exp(x), color=c1)
+    ax1.plot(x, 1 + x + x**2/2, color=c2)
+    ax1.plot(xL, 1 + np.log(1 + xL), color=c3)
+
+    ax1.plot([0], [1], 'o', color='black', markersize=6, zorder=5)
+
+    ax1.text(1.0, 2.0, r"$e^x$", color=c1)
+    ax1.text(1.5, 1.5, r"$1+x+\frac{x^2}{2}$", color=c2)
+    ax1.text(0.4, 1.0, r"$1+\log(1+x)$", color=c3)
+
+    ax1.set_xticks([-1, 0, 1, 2])
+    ax1.set_yticks([0, 1, 2, 3])
+
+    # p-G (right) plot
+    ax2.axhline(0, color="lightgrey")
+    ax2.axvline(0, color="lightgrey")
+
+    # Common tangent line G = -1 at (1, -1)
+    pt = np.linspace(-0.3, 3.5, 21)
+    ax2.plot(pt, np.full_like(pt, -1), ':', color='grey')
+
+    p_pos = np.linspace(0.02, 3.5, 201)
+    p_all = np.linspace(-0.3, 3.5, 201)
+
+    ax2.plot(p_pos, p_pos * np.log(p_pos) - p_pos, color=c1)
+    ax2.plot(p_all, (p_all - 1)**2 / 2 - 1, color=c2)
+    ax2.plot(p_pos, np.log(p_pos) - p_pos, color=c3)
+
+    ax2.plot([1], [-1], 'o', color='black', markersize=6, zorder=5)
+
+    ax2.text(2.5, -0.5, r"$p\,\log p - p$", color=c1)
+    ax2.text(2.2, 1.5, r"$\frac{(p-1)^2}{2} - 1$", color=c2)
+    ax2.text(1.7, -1.5, r"$\log p - p$", color=c3)
+
+    ax2.set_xticks([0, 1, 2, 3])
+    ax2.set_yticks([-1, 0, 1])
+
+    plt.tight_layout()
+    plt.savefig(IMGDIR / 'legendre-locality.png', bbox_inches='tight')
+
+
+def legendre_locality_2():
+    config = LegendreAxesConfig(
+        xlim1=(-0.5, 3.5),
+        ylim1=(-0.5, 3.5),
+        xlim2=(-1.2, 2.8),
+        ylim2=(-1.5, 2.5),
+    )
+    fig, ax1, ax2 = setup_legendre_axes(config)
+
+    c1 = plt.cm.viridis(0.1)
+    c2 = plt.cm.viridis(0.45)
+    c3 = plt.cm.viridis(0.75)
+
+    # x-F (left) plot
+    ax1.axhline(0, color="lightgrey")
+    ax1.axvline(0, color="lightgrey")
+
+    # Common tangent line y = x at (1, 1)
+    x = np.linspace(-0.5, 3.5, 201)
+    ax1.plot(x, x, ':', color='grey')
+
+    eps = 1e-5
+    xlog = np.linspace(eps, 3.5, 201)
+
+    ax1.plot(x, np.exp(x - 1), color=c1)
+    ax1.plot(x, (1 + x**2) / 2, color=c2)
+    ax1.plot(xlog, 1 + np.log(xlog), color=c3)
+
+    ax1.plot([1], [1], 'o', color='black', markersize=6, zorder=5)
+    space = 0.07
+    ax1.text(1 + space, 1 - space, r"$(1, 1)$", ha="left", va="top")
+
+    ax1.text(1.6, 3.2, r"$e^{x-1}$", color=c1)
+    ax1.text(2.4, 3.0, r"$\frac{x^2 + 1}{2}$", color=c2)
+    ax1.text(2.0, 1.4, r"$1+\log x$", color=c3)
+
+    ax1.set_xticks([0, 1, 2, 3])
+    ax1.set_yticks([0, 1, 2, 3])
+
+    # p-G (right) plot
+    ax2.axhline(0, color="lightgrey")
+    ax2.axvline(0, color="lightgrey")
+
+    # Common tangent line G = p - 1 at (1, 0)
+    p = np.linspace(-1.5, 3.5, 201)
+    ax2.plot(p, p - 1, ':', color='grey')
+
+    plog = np.linspace(eps, 3.5, 201)
+
+    ax2.plot(plog, plog * np.log(plog), color=c1)
+    ax2.plot(p, (p**2 - 1) / 2, color=c2)
+    ax2.plot(plog, np.log(plog), color=c3)
+
+    ax2.plot([1], [0], 'o', color='black', markersize=6, zorder=5)
+    space = 0.07
+    ax2.text(1 + space, 0 - space, r"$(1, 0)$", ha="left", va="top")
+
+    ax2.text(0.05, 0.1, r"$p\,\log p$", color=c1)
+    ax2.text(-1.0, -0.65, r"$\frac{p^2 - 1}{2}$", color=c2)
+    ax2.text(2.0, 0.5, r"$\log p$", color=c3)
+
+    ax2.set_xticks([-1, 0, 1, 2])
+    ax2.set_yticks([-1, 0, 1, 2])
+
+    plt.tight_layout()
+    plt.savefig(IMGDIR / 'legendre-locality-2.png', bbox_inches='tight')
+
+
 def arctanh_integral():
     config = LegendreAxesConfig(
         xlim1=(-2.3, 2.3),
@@ -619,5 +753,7 @@ with plt.xkcd():
     # single_valued()
     # lengths_vs_areas()
     # lengths_vs_areas_flipped()
-    differentials()
+    # differentials()
     # arctanh_integral()
+    # legendre_locality()
+    legendre_locality_2()
