@@ -494,52 +494,90 @@ The first equation is the same as the single-variable case, where $x = x(p, y)$
 is obtained by solving $p = p(x, y)$ for $x$. The second equation says that
 slopes in the direction of the "spectator" variable $y$ are flipped! Why?
 
-To develop intution for the sign flip, imagine a "slice" of the function
-$F(x,y_0)$ for fixed $y_0$. The transform is the usual $G(p,y_0)$. What happens
-when we take a small step in the $y$ direction? The slice of $F$ at $y_0 + dy$
-is shifted from the slice at $y_0$ by a small amount
+Imagine a "slice" of the function $F(x,y_0)$ for fixed $y_0$. We find the usual
+transform $G(p,y_0)$ by drawing the tangent line (dotted) with slope $p$ and
+record the negative intercept.
+
+![](/images/legendre/legendre-spectator-slices.png)
+
+When we take a small step $dy$ in the $y$ direction, the slice $F(x, y_0 + dy)$
+is shifted relative to the slice at $y_0$ by a small amount
 
 $$ F(x, y_0 + dy) \simeq F(x, y_0) + q(x, y_0)\,dy $$
 
-How does the shift $q(x, y_0)\,dy$ affect $G$?
+In the example above, the shift $q\,dy$ is positive, which causes the intercept
+to increase by the same amount, and $G$ to decrease by $q\,dy$:
 
-Intuition for the minus sign comes from two properties of the Legendre
-transform: locality and vertical shifts. The Legendre transform is local in the
-following manner: to compute the transform at a point $x$, we only need to know
-the value $F(x)$ and slope $p = F'(x)$. With those two pieces of information,
-we can draw the tangent line and fine the $y$-intercept $-G$. The transform
-does not depend on what happens elsewhere in the function. For example, I
-plotted three functions which all pass through the point $(x, F) = (1, 1)$ and
-have the same slope $p = 1$. The Legendre transform maps to $(p, G) = (1, 0)$
-and you can see all three transforms coincide.
+$$ G(p, y_0 + dy) \simeq G(p, y_0) - q(x(p, y_0), y_0)\,dy $$
 
-![](/images/legendre/legendre-locality-2.png)
+Put another way, $F$ and $G$ must shift in opposite directions to preserve the
+relation $F + G = p\,x$.
 
+The geometric result of the sign change of the spectator partials is a flip in
+concavity for the spectator dimensions. For example, a convex paraboloid
 
-We can transform either of the variables individually, or both.
+$$ F(x,y) = \frac{1}{2}(x^2+y^2) \quad \rightarrow \quad
+   G(p,y) = \frac{1}{2}(p^2-y^2) $$
 
-We'll call them $G(p, y)$, $H(x, q)$, and $K(p, q)$.
+becomes a hyperbolic paraboloid (saddle).
 
-Running through the remaining cases gives us a table of all 4 functions:
+![](/images/legendre/legendre-paraboloid-3d.png)
 
-| function  | differential     |
-| --------- | ---------------- |
-| $F(x, y)$ | $ p\,dx + q\,dy$ |
-| $G(p, y)$ | $ x\,dp - q\,dy$ |
-| $H(x, q)$ | $-p\,dx + y\,dq$ |
-| $K(p, q)$ | $ x\,dp + y\,dq$ |
+> For those that are detailed-oriented, you may be concerned that cross terms
+> may impact the results. They do not. For a twice-differentiable function
+> $F(\vec{x},\vec{y})$ where $\vec{x}$ is a vector of variables to be
+> transformed and $\vec{y}$ is a vector of spectator variables, we define
+> $\vec{p} = \nabla_\vec{x} F(\vec{x},\vec{y})$ and the Legendre transform
+>
+> $$ G(\vec{p},\vec{y}) = \vec{p}^\mathrm{T}\vec{x}(\vec{p},\vec{y})
+>                         - F(\vec{x}(\vec{p},\vec{y}), \vec{y}) $$
+>
+> The Hessian matrices, which tell us the concavity, are
+>
+> $$ H_F =
+> \begin{pmatrix}
+>   F_{\vec{x}\vec{x}} & F_{\vec{x}\vec{y}} \\
+>   F_{\vec{y}\vec{x}} & F_{\vec{y}\vec{y}}
+> \end{pmatrix}
+> $$
+>
+> and
+>
+> $$ H_G =
+> \begin{pmatrix}
+>   G_{\vec{p}\vec{p}} & G_{\vec{p}\vec{y}} \\
+>   G_{\vec{y}\vec{p}} & G_{\vec{y}\vec{y}}
+> \end{pmatrix} =
+> \begin{pmatrix}
+>   F_{\vec{x}\vec{x}}^{-1} & -F_{\vec{x}\vec{x}}^{-1} F_{\vec{x}\vec{y}} \\
+>   -F_{\vec{y}\vec{x}} F_{\vec{x}\vec{x}}^{-1} & -F_{\vec{y}\vec{y}} + F_{\vec{y}\vec{x}} F_{\vec{x}\vec{x}}^{-1} F_{\vec{x}\vec{y}}
+> \end{pmatrix}
+> $$
+>
+> The negative of the
+> [Schur complement](https://en.wikipedia.org/wiki/Schur_complement)
+> $S = F_{\vec{y}\vec{y}} - F_{\vec{y}\vec{x}} F_{\vec{x}\vec{x}}^{-1}
+> F_{\vec{x}\vec{y}}$ appears in the lower-right quadrant, and it controls the
+> concavity of the spectator variables $G_{\vec{y}\vec{y}}$.
+>
+> The properties of the Schur complement imply that if $H_F$ is
+> positive-definite, then so is $S$, which means $G_{\vec{y}\vec{y}} = -S$ is
+> negative-definite. Similar arguments can be made in the other cases of
+> concavity.
 
+Returning to the original function $F(x,y)$, we could equally transformed $y$,
+or both $x$ and $y$ simultaneously. Notating the remaining combinations
+$H(x,q)$, and $K(p,q)$ and working out their differentials gives:
 
+| function  | differential     | example                   |
+| --------- | ---------------- | ------------------------- |
+| $F(x, y)$ | $ p\,dx + q\,dy$ | $\frac{1}{2}(x^2 + y^2)$  |
+| $G(p, y)$ | $ x\,dp - q\,dy$ | $\frac{1}{2}(p^2 - y^2)$  |
+| $H(x, q)$ | $-p\,dx + y\,dq$ | $\frac{1}{2}(-x^2 + q^2)$ |
+| $K(p, q)$ | $ x\,dp + y\,dq$ | $\frac{1}{2}(p^2 + q^2)$  |
 
-The second term acquires a minus sign. The spectator variables aren't left
-alone (why is this important?). Example:
-
-$$f(x, y) = x^2 + y^2$$
-
-$$g(p, y) = \frac{p^2}{4} - y^2$$
-
-We went from a paraboloid to a hyperbolic paraboloid. Again, why is this
-important?
+The spectator variables always change concavity, while the transformed
+dimensions preserve their concavity.
 
 I can't pass up showing you one more surprising connection the Legendre
 transform has to integral calculus before moving to physics.
@@ -739,6 +777,21 @@ presentation we chose above?
 
 What is an example of this maximization in action? Example of gas piston with
 spring. [Wait, doesn't this involve a change in volume?]
+
+---
+
+Intuition for the minus sign comes from two properties of the Legendre
+transform: locality and vertical shifts. The Legendre transform is local in the
+following manner: to compute the transform at a point $x$, we only need to know
+the value $F(x)$ and slope $p = F'(x)$. With those two pieces of information,
+we can draw the tangent line and fine the $y$-intercept $-G$. The transform
+does not depend on what happens elsewhere in the function. For example, I
+plotted three functions which all pass through the point $(x, F) = (1, 1)$ and
+have the same slope $p = 1$. The Legendre transform maps to $(p, G) = (1, 0)$
+and you can see all three transforms coincide.
+
+![](/images/legendre/legendre-locality.png)
+
 
 # Notes
 

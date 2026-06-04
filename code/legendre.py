@@ -571,7 +571,7 @@ def differentials():
     plt.savefig(IMGDIR / 'differentials.png', bbox_inches='tight')
 
 
-def legendre_locality():
+def legendre_locality_2():
     config = LegendreAxesConfig(
         xlim1=(-1.5, 2.5),
         ylim1=(-0.5, 3.5),
@@ -634,10 +634,10 @@ def legendre_locality():
     ax2.set_yticks([-1, 0, 1])
 
     plt.tight_layout()
-    plt.savefig(IMGDIR / 'legendre-locality.png', bbox_inches='tight')
+    plt.savefig(IMGDIR / 'legendre-locality-2.png', bbox_inches='tight')
 
 
-def legendre_locality_2():
+def legendre_locality():
     config = LegendreAxesConfig(
         xlim1=(-0.5, 3.5),
         ylim1=(-0.5, 3.5),
@@ -702,7 +702,130 @@ def legendre_locality_2():
     ax2.set_yticks([-1, 0, 1, 2])
 
     plt.tight_layout()
-    plt.savefig(IMGDIR / 'legendre-locality-2.png', bbox_inches='tight')
+    plt.savefig(IMGDIR / 'legendre-locality.png', bbox_inches='tight')
+
+
+def legendre_spectator_slices():
+    config = LegendreAxesConfig(
+        xlim1=(-1.5, 2.5),
+        ylim1=(-1.0, 3.0),
+        xlim2=(-2.0, 2.0),
+        ylim2=(-1.5, 2.5),
+    )
+    fig, ax1, ax2 = setup_legendre_axes(config)
+
+    c0 = plt.cm.viridis(0.15)
+    c1 = plt.cm.viridis(0.65)
+
+    def F(x, y): return (x**2 + y**2) / 2
+    def G(p, y): return (p**2 - y**2) / 2
+
+    y0 = 0.8
+    dy = 0.4
+    p_tan = 1.0
+
+    # F(x, y) = (x^2 + y^2) / 2.  Tangent point at slope p is x = p.
+    xs = p_tan
+    F0 = F(xs, y0)
+    F1 = F(xs, y0 + dy)
+    G0 = p_tan * xs - F0
+    G1 = p_tan * xs - F1
+
+    # ----- Left panel: F vs x -----
+    ax1.axhline(0, color="lightgrey")
+    ax1.axvline(0, color="lightgrey")
+
+    x = np.linspace(-1.5, 3.5, 201)
+
+    ax1.plot(x, F(x, y0), color=c0)
+    ax1.plot(x, F(x, y0 + dy), color=c1)
+
+    # Parallel tangent lines at slope p
+    ax1.plot(x, p_tan * x - G0, ':', color='k', alpha=0.3)
+    ax1.plot(x, p_tan * x - G1, ':', color='k', alpha=0.3)
+
+    # Tangent points and y-intercepts
+    ax1.plot([xs], [F0], 'o', color=c0, zorder=5)
+    ax1.plot([xs], [F1], 'o', color=c1, zorder=5)
+    ax1.plot([0], [-G0], 'o', color=c0, zorder=5)
+    ax1.plot([0], [-G1], 'o', color=c1, zorder=5)
+
+    # Vertical shift arrow at the tangent point: F goes up by q dy
+    darrow = 0.03
+    ax1.annotate("", xy=(xs, F1 - darrow), xytext=(xs, F0 + darrow),
+                 arrowprops=dict(arrowstyle="->", color="black"))
+    ax1.text(xs + 0.28, (F0 + F1) / 2, r"$+q\,dy$", va="center")
+
+    # Vertical shift arrow at the y-axis: -G goes up by q dy
+    ax1.annotate("", xy=(0, -G1 - darrow), xytext=(0, -G0 + darrow),
+                 arrowprops=dict(arrowstyle="->", color="black"))
+    ax1.text(-0.18, (-G0 - G1) / 2, r"$+q\,dy$", ha="right", va="center")
+
+    # Curve labels
+    ax1.text(1.8, 1.7, r"$F(x, y_0)$", color=c0)
+    ax1.text(0.6, 2.4, r"$F(x, y_0{+}dy)$", color=c1)
+
+    # Intercept labels
+    ax1.text(0.15, -G0 - 0.22, r"$-G(p,y_0)$", color=c0)
+    ax1.text(0.15, -G1 - 0.10, r"$-G(p,y_0{+}dy)$", color=c1)
+
+    ax1.set_xticks([-1, 0, 1, 2])
+    ax1.set_yticks([-1, 0, 1, 2])
+
+    # ----- Right panel: G vs p -----
+    ax2.axhline(0, color="lightgrey")
+    ax2.axvline(0, color="lightgrey")
+
+    p = np.linspace(-2.5, 3.0, 201)
+
+    ax2.plot(p, G(p, y0), color=c0)
+    ax2.plot(p, G(p, y0 + dy), color=c1)
+
+    ax2.plot([p_tan], [G0], 'o', color=c0, zorder=5)
+    ax2.plot([p_tan], [G1], 'o', color=c1, zorder=5)
+
+    # Downward shift arrow at p
+    ax2.annotate("", xy=(p_tan, G1 + darrow), xytext=(p_tan, G0 - darrow),
+                 arrowprops=dict(arrowstyle="->", color="black"))
+    # ax2.text(p_tan - 0.28, (G0 + G1) / 2, r"$-q\,dy$", va="center")
+    ax2.text(p_tan - 0.15, G0 - 0.1, r"$-q\,dy$", ha="right", va="bottom")
+
+    # Curve labels
+    ax2.text(-1.5, 1.0, r"$G(p, y_0)$", color=c0)
+    ax2.text(-1.7, -0.8, r"$G(p, y_0{+}dy)$", color=c1)
+
+    ax2.set_xticks([-2, -1, 0, 1])
+    ax2.set_yticks([-1, 0, 1, 2])
+
+    plt.tight_layout()
+    plt.savefig(IMGDIR / 'legendre-spectator-slices.png', bbox_inches='tight')
+
+
+def legendre_paraboloid_3d():
+    fig = plt.figure(figsize=(11, 5), dpi=150)
+    ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+    ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+
+    n = 201
+    rng = np.linspace(-2, 2, n)
+    X, Y = np.meshgrid(rng, rng)
+
+    # Left: F(x, y) = (x^2 + y^2) / 2  (paraboloid / bowl)
+    F = (X**2 + Y**2) / 2
+    ax1.plot_surface(X, Y, F, cmap='viridis', edgecolor='none', alpha=0.9)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
+    ax1.set_zlabel('F')
+
+    # Right: G(p, y) = (p^2 - y^2) / 2  (hyperbolic paraboloid / saddle)
+    G = (X**2 - Y**2) / 2
+    ax2.plot_surface(X, Y, G, cmap='viridis', edgecolor='none', alpha=0.9)
+    ax2.set_xlabel('p')
+    ax2.set_ylabel('y')
+    ax2.set_zlabel('G')
+
+    plt.tight_layout()
+    plt.savefig(IMGDIR / 'legendre-paraboloid-3d.png', bbox_inches='tight')
 
 
 def arctanh_integral():
@@ -756,4 +879,6 @@ with plt.xkcd():
     # differentials()
     # arctanh_integral()
     # legendre_locality()
-    legendre_locality_2()
+    # legendre_locality_2()
+    # legendre_spectator_slices()
+    legendre_paraboloid_3d()
